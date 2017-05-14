@@ -1,0 +1,16 @@
+{
+  "name": "angular-strap-docs",
+  "dependencies": {
+    "angular": "~1.5",
+    "angular-animate": "~1.5",
+    "angular-i18n": "~1.5",
+    "angular-motion": "^0.4.4",
+    "angular-route": "~1.5",
+    "fastclick": "~1.0.6",
+    "highlightjs": "~9.2.0",
+    "jquery": "^2.2.0",
+    "nox-ui": "*"
+  },
+  "devDependencies": {
+  }
+}

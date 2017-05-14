@@ -1,0 +1,56 @@
+<div class="bs-docs-section" ng-controller="RangeDatepickerDemoCtrl">
+
+  <div class="page-header">
+    <h1 id="rangedatepickers">RangeDatepickers <a class="small" href="//github.com/mgcrea/angular-strap/blob/master/src/rangedatepicker/rangedatepicker.js" target="_blank">datepicker.js</a>
+    </h1>
+    <code>mgcrea.ngStrap.rangedatepicker</code>
+  </div>
+
+
+  <h2 id="rangedatepickers-examples">Examples</h2>
+  <p>Add range datepicker functionality with any form text input.</p>
+
+  <div class="callout callout-danger">
+    <h4>Plugin dependency</h4>
+    <p>RangeDatepickers require the <a href="#tooltips">tooltip module</a> and <a href="//github.com/mgcrea/angular-strap/blob/master/src/helpers/date-parser.js" target="_blank">dateParser helper</a> module to be loaded.</p>
+    <p>These docs currently use <a href="//github.com/mgcrea/bootstrap-additions/blob/master/src/datepicker/datepicker.less" target="_blank">bootstrap-additions</a> for styling purposes.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <h4>Support for locales</h4>
+    <p>This module leverages the <a href="http://docs.angularjs.org/api/ng.$locale">$locale</a> service. You just have to load the proper <a href="http://docs.angularjs.org/guide/i18n">i18n</a> file to seamlessly translate your datepickers.</p>
+  </div>
+
+  <h3>Live demo <a class="small edit-plunkr" data-module-name="mgcrea.ngStrapDocs" data-content-html-url="datepicker/docs/datepicker.demo.html" data-content-js-url="datepicker/docs/datepicker.demo.js" ng-plunkr data-placement="right" bs-tooltip></a></h3>
+  <pre class="bs-example-scope">$scope.selectedDate = {{selectedDate}}; // &lt;- {{ getType('selectedDate') }}
+$scope.selectedDateAsNumber = {{selectedDateAsNumber}}; // &lt;- {{ getType('selectedDateAsNumber') }}
+$scope.fromDate = {{fromDate}}; // &lt;- {{ getType('fromDate') }}
+$scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
+</pre>
+  <div class="bs-example" style="padding-bottom: 24px;">
+    <form name="datepickerForm" class="form-inline" role="form">
+      <!-- Basic example -->
+      <div class="form-group" ng-class="{'has-error': datepickerForm.date.$invalid}">
+        <label class="control-label"><i class="fa fa-calendar"></i> Date <small>(as date)</small></label>
+        <input type="text" class="form-control" ng-model="selectedDate" name="date" bs-rangedatepicker>
+      </div>
+      <!-- Custom example -->
+      <!--<div class="form-group" ng-class="{'has-error': datepickerForm.date2.$invalid}">-->
+        <!--<label class="control-label"><i class="fa fa-calendar"></i> Date <small>(as number)</small></label>-->
+        <!--<input type="text" class="form-control" ng-model="selectedDateAsNumber" data-date-format="yyyy-MM-dd" data-date-type="number" data-min-date="02/10/86" data-max-date="today" data-autoclose="1" name="date2" bs-rangedatepicker>-->
+      <!--</div>-->
+      <!--<hr>-->
+      <!--&lt;!&ndash; Date range example &ndash;&gt;-->
+      <!--<div class="form-group">-->
+        <!--<label class="control-label"><i class="fa fa-calendar"></i> <i class="fa fa-arrows-h"></i> <i class="fa fa-calendar"></i> Date range <small>(dynamic)</small></label><br>-->
+        <!--<div class="form-group col-xs-6">-->
+          <!--<input type="text" class="form-control" ng-model="fromDate"  data-max-date="{{untilDate}}" placeholder="From" data-has-today="true" data-has-clear="true" data-date-type="number" bs-rangedatepicker>-->
+        <!--</div>-->
+        <!--<div class="form-group col-xs-6">-->
+          <!--<input type="text" class="form-control" data-date-type="number" ng-model="untilDate"  data-min-date="{{fromDate}}" placeholder="Until" data-has-today="true" data-has-clear="false" bs-rangedatepicker>-->
+        <!--</div>-->
+      <!--</div>-->
+    </form>
+  </div>
+
+</div>

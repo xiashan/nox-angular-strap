@@ -1,0 +1,33 @@
+{
+  "name": "nox-ui",
+  "homepage": "https://github.com/xiashan/nox-ui",
+  "authors": [
+    "xs",
+    "wj"
+  ],
+  "description": "nox-ui is a Sass-powered version of nox-bootstrap, ready to drop right into your Sass powered applications.",
+  "moduleType": "globals",
+  "main": [
+    "assets/stylesheets/_bootstrap.scss",
+    "assets/javascripts/bootstrap.js"
+  ],
+  "keywords": [
+    "nox",
+    "bootstrap",
+    "sass"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "1.9.1 - 3"
+  },
+  "_release": "859ed7ab46",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "859ed7ab46d7330017e872f335fd76d3d4c5df8d"
+  },
+  "_source": "https://github.com/xiashan/nox-ui.git",
+  "_target": "*",
+  "_originalSource": "nox-ui",
+  "_direct": true
+}

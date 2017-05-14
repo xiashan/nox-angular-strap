@@ -1,0 +1,17 @@
+<div ng-class="$pageClass">
+  <!--分页-->
+  <ul ng-show="totalItems > 0">
+    <li ng-class="{disabled: noPrevious()}" ng-click="selectPrevious($event)"><span class="nox-sort-left"></span></li>
+    <li ng-repeat="item in pages track by $index" ng-class="{active: item.active, separate: item.text == '...'}"
+        ng-click="selectPage(item.number, $event)">
+      <span>{{ item.text }}</span>
+    </li>
+    <li ng-class="{disabled: noNext()}" ng-click="selectNext($event)"><span class="nox-sort-right"></span></li>
+  </ul>
+  <!--总条数-->
+  <span class="ml-2x" ng-show="totalItems > 0">Total:{{ totalItems }}</span>
+  <!--无结果-->
+  <div class="no-items text-primary" ng-show="totalItems == 0"><i class="nox-exclamation-circle-o"></i> <p>no result</p></div>
+  <!--加载中-->
+  <div class="ball-loading" ng-show="totalItems == -1"><div></div></div>
+</div>

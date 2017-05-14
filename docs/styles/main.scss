@@ -1,0 +1,297 @@
+
+//@import "../bower_components/nox-ui/assets/stylesheets/bootstrap";
+//@import "main/animations";
+
+
+$docs-color: hsl(1, 45%, 50%);
+@import "docs/docs";
+
+
+// .am-fade {
+
+//   animation-duration: 3s;
+
+// }
+//
+//
+
+// FORM FIELD FEEDBACK STATES
+// --------------------------
+
+// AngularJS invalid states
+// @from forms.less:367
+//input.ng-dirty.ng-invalid,
+//textarea.ng-dirty.ng-invalid,
+//select.ng-dirty.ng-invalid {
+//  color: #b94a48;
+//  border-color: #ee5f5b;
+//  &:focus {
+//    border-color: darken(#ee5f5b, 10%);
+//    .box-shadow(0 0 6px lighten(#ee5f5b, 20%));
+//  }
+//}
+//
+input:focus.ng-pristine.ng-invalid,
+textarea:focus.ng-pristine.ng-invalid,
+select:focus.ng-pristine.ng-invalid {
+  color: $gray-bd;
+  border: 1px solid $gray-bd-darker;
+  &:focus {
+    border-color: rgba(82,168,236,.8);
+  }
+}
+
+[tabindex="-1"] {
+  outline: none;
+}
+
+a[ng-click] {
+  cursor: pointer;
+}
+
+code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  border-radius: 4px;
+}
+
+
+// Drop modal scroll support
+body {
+  // &.modal-open {
+  //   overflow-y: hidden;
+  //   padding-right: 15px;
+  //   .navbar-fixed-top {
+  //     padding-right: 15px;
+  //   }
+  // }
+//  .modal {
+//    overflow-y: hidden;
+//  }
+//  &.modal-open {
+//    overflow-y: visible !important;
+//  }
+}
+
+.lt-ie9 {
+  .bs-sidebar {
+    display: none !important;
+  }
+}
+
+.btn[bs-select] {
+  outline: none;
+}
+
+//.modal-backdrop {
+//  z-index: 1040;
+//  bottom: 0px;
+//}
+
+//.datepicker.dropdown-menu {
+//  width: 250px;
+//  height: 290px;
+//  button {
+//    outline: none;
+//    border: 0px;
+//  }
+//  tbody {
+//    height: 180px;
+//  }
+//  tbody button {
+//    padding: 6px;
+//  }
+//  &.datepicker-mode-1, &.datepicker-mode-2 {
+//    tbody button {
+//      height: 65px;
+//    }
+//  }
+//}
+//
+//.timepicker.dropdown-menu {
+//  padding: 0 4px;
+//  button {
+//    outline: none;
+//    border: 0px;
+//  }
+//  tbody button {
+//    padding: 6px;
+//  }
+//}
+//
+//.select.dropdown-menu.select-multiple {
+//  li {
+//    position: relative;
+//    > i {
+//      color: white;
+//      display: none;
+//      position: absolute;
+//      top:5px;
+//      right:10px;
+//    }
+//    &.active {
+//      > i {
+//        display: block;
+//      }
+//    }
+//  }
+//}
+//
+//body {
+//  position: relative; /* For scrollyspy */
+//  padding-top: 40px; /* Account for fixed navbar */
+//}
+
+/* Tweak display of the code snippets when following an example */
+.bs-example-scope {
+  + .bs-example {
+    margin: -15px -15px 15px;
+    + .highlight > pre {
+      border-radius: 0 0 4px 4px;
+    }
+  }
+}
+
+.bs-docs-home, .bs-header, .bs-masthead  {
+  // background: #f7f7f7 ;
+  // background-size: cover;
+  // background-position: 50% 30%;
+}
+
+.aside.bs-docs-aside {
+  .aside-header {
+    background: $brand-primary;
+  }
+  .nav {
+    margin: 0px;
+  }
+}
+
+.bs-docs-social {
+  max-height: 200px;
+  ul {
+    list-style: none;
+    padding: 1em 0 0 0;
+    li {
+      height: 30px;
+      @media (max-width: $screen-sm-max) {
+        display: inline-block;
+      }
+    }
+  }
+}
+
+///*
+// * Topography, yo!
+// *
+// * Apply the map background via base64 and relevant colors where we need 'em.
+// */
+//
+.bs-docs-home,
+.bs-header {
+  color: white;
+  background: $docs-color url("./../images/triangular-red.png");
+  padding-bottom: 20px;
+}
+
+/* Echo out a label for the example */
+// .bs-exemple-source, .highlight {
+  pre > code {
+    background: transparent;
+  }
+// }
+.bs-example + .highlight {
+    position: relative;
+    code {
+      padding: 2.5em 0.5em 1em;
+    }
+    &:after {
+      content: "Source";
+      position: absolute;
+      top:  15px;
+      left: 15px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+}
+
+.edit-plunkr, a[ng-click] {
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  cursor: pointer;
+}
+.panel-heading[role="tab"] .panel-title a {
+  cursor: pointer;
+}
+
+.twitter-follow-button {
+  position:relative;
+  top: 5px;
+  margin-left: 10px;
+}
+
+.tab-pane.am-fade {
+  animation-duration: .3s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  opacity: 1;
+
+  &.active-remove {
+    display: none !important;
+  }
+  &.active-add {
+    animation-name: fadeIn;
+  }
+}
+
+.panel-collapse.am-collapse {
+  animation-duration: .3s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  overflow: hidden;
+  &.in-remove {
+    animation-name: collapse;
+    display: block;
+  }
+  &.in-add {
+    animation-name: expand;
+  }
+}
+
+.panel-collapse.am-collapse2 {
+  transition: .3s ease max-height;
+  max-height: 100px;
+  overflow: hidden;
+  &.in-remove {
+    max-height: 100px;
+    display: block;
+  }
+  &.in-add {
+    max-height: 0px;
+  }
+}
+
+@keyframes expand {
+  from {
+    max-height: 0px;
+  }
+  to {
+    max-height: 100px;
+  }
+}
+
+@keyframes collapse {
+  from {
+    max-height: 100px;
+  }
+  to {
+    max-height: 0px;
+  }
+}

@@ -1,0 +1,45 @@
+.pagination {
+  text-align: center;
+  ul {
+    display: inline-block;
+    padding-left: 0;
+    margin: 8px 0;
+    li{
+      display: inline-block;
+      margin-left: 8px;
+      border: 1px solid $gray-bd;
+      padding: 1px 7px;
+      font-size: 12px;
+      border-radius: $border-radius-base;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      span {
+        line-height: 20px;
+      }
+    }
+  }
+  .disabled{
+    background: $gray-bg-lighter;
+    cursor: not-allowed;
+  }
+  .active{
+    color: #fff;
+    background-color: $brand-primary;
+    border: 1px solid $brand-primary;
+  }
+  .separate {
+    border: none;
+  }
+  .no-items {
+    padding: 96px;
+    i {
+      font-size: 24px;
+    }
+  }
+  .ball-loading {
+    padding: 96px 0;
+  }
+}
+
+
