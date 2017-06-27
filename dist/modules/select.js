@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-03-06
+ * @version v2.3.10 - 2017-06-27
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -22,7 +22,7 @@ angular.module('mgcrea.ngStrap.select', [ 'mgcrea.ngStrap.tooltip', 'mgcrea.ngSt
     multiple: false,
     allNoneButtons: false,
     sort: true,
-    caretHtml: '&nbsp;<span class="caret"></span>',
+    caretHtml: '&nbsp;<span class="select-arrow"><i class="nox-sort-down"></i></span>',
     placeholder: 'Choose among the following...',
     allText: 'All',
     noneText: 'None',

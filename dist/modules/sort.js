@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-03-06
+ * @version v2.3.10 - 2017-06-27
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -47,7 +47,7 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [ function() {
             scope.sortBy = scope.sortBy === 'asc' ? 'desc' : 'asc';
           } else {
             scope.orderBy = dataName;
-            scope.sortBy = 'asc';
+            scope.sortBy = 'desc';
           }
           scope.$apply();
           if (angular.isDefined(options.onSort) && angular.isFunction(options.onSort)) {

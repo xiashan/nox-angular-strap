@@ -141,6 +141,10 @@ $btn-danger-color:               #fff !default;
 $btn-danger-bg:                  $brand-danger !default;
 $btn-danger-border:              $btn-danger-bg !default;
 
+$btn-ghost-color:                $brand-primary !default;
+$btn-ghost-bg:                   transparent !default;
+$btn-ghost-border:               $brand-primary !default;
+
 // Allows for customizing button radius independently from global border radius
 $btn-border-radius-base:         $border-radius-base !default;
 $btn-border-radius-large:        $border-radius-large !default;
@@ -321,7 +325,7 @@ $popover-fallback-border-color:       #ccc !default;
 $popover-title-bg:                    darken($popover-bg, 3%) !default;
 
 //** Popover arrow width
-$popover-arrow-width:                 10px !default;
+$popover-arrow-width:                 8px !default;
 //** Popover arrow color
 $popover-arrow-color:                 $popover-bg !default;
 

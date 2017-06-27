@@ -9,9 +9,16 @@ angular.module('mgcrea.ngStrapDocs')
     });
   })
 
-  .controller('RangeDatepickerDemoCtrl', function($scope, $http) {
+  .controller('RangeDatepickerDemoCtrl', function ($scope, $http) {
 
-    $scope.selectedDate = new Date('1986-11-12');
+    $scope.selectedDate = {
+      // startDate: new Date('2017/04/05'),
+      // endDate: new Date('2017/05/12'),
+      dateRange: '-2d'
+    };
+    $scope.maxDate = new Date();
+    $scope.minDate = new Date('2017/03/01');
+    // number
     $scope.selectedDateAsNumber = Date.UTC(1986, 1, 22);
     // $scope.fromDate = new Date();
     // $scope.untilDate = new Date();

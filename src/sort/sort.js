@@ -43,7 +43,7 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [function() {
           }
           else {
             scope.orderBy = dataName;
-            scope.sortBy = 'asc';
+            scope.sortBy = 'desc';
           }
           scope.$apply();
 
