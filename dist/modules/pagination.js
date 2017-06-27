@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-03-06
+ * @version v2.3.10 - 2017-06-27
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -115,7 +115,7 @@ angular.module('mgcrea.ngStrap.pagination', []).provider('$pagination', function
         options.pagesLength = options.pagesLength + 1;
       }
       ngModelCtrl.$render = function() {
-        scope.page = (parseInt(ngModelCtrl.$viewValue, 10) || 1) > scope.totalPages ? scope.totalPages : scope.page;
+        scope.page = (scope.page = parseInt(ngModelCtrl.$viewValue, 10) || 1) > scope.totalPages ? scope.totalPages : scope.page;
         if (scope.page > 0 && scope.page <= scope.totalPages) {
           scope.pages = bsPaginationCtrl.getPages(scope.page, scope.totalPages, options.pagesLength);
         }
