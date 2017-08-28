@@ -502,14 +502,14 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             var endDate;
             if (angular.isUndefined(modelValue) || modelValue === null) {
               return '';
-            } else if (modelValue.startDate && modelValue.endDate) {
-              startDate = getFormattedDate(modelValue.startDate);
-              endDate = getFormattedDate(modelValue.endDate);
-              controller.$dateValue = [dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone)];
             } else if (modelValue.dateRange) {
               controller.$dateRange = modelValue.dateRange;
               controller.$dateValue = !controller.$dateValue ? [] : controller.$dateValue;
               rangedatepicker.$selectRange(controller.$dateRange);
+            } else if (modelValue.startDate && modelValue.endDate) {
+              startDate = getFormattedDate(modelValue.startDate);
+              endDate = getFormattedDate(modelValue.endDate);
+              controller.$dateValue = [dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone)];
             }
             controller.$compareDateValue = [];
 

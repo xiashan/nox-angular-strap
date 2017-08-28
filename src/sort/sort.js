@@ -3,7 +3,7 @@
 angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [function() {
   return {
     scope: true,
-    compile: function(element, attrs) {
+    compile: function (element, attrs) {
       var list = element[0].querySelectorAll('th');
       for (var i = 0, len = list.length; i < len; i++) {
         var item = list[i];
@@ -26,22 +26,29 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [function() {
             options[key] = scope.$eval(attrs[bsKey]);
           }
         });
+        if (angular.isDefined(attrs.totalItems)) {
+          attrs.$observe('totalItems', function (newValue) {
+            options.totalItems = newValue;
+          });
+        }
         var list = element[0].querySelectorAll('th');
         for (var i = 0, len = list.length; i < len; i++) {
           var item = list[i];
           item = angular.element(item);
           if (item.attr('data-sortable')) {
-            item.on('click', clickColumn)
+            item.on('click', clickColumn);
           }
         }
 
-        function clickColumn(event) {
+        function clickColumn (event) {
+          if (options.totalItems === -1) {
+            return;
+          }
           var target = angular.element(event.currentTarget);
           var dataName = target.attr('data-name');
           if (dataName === scope.orderBy) {
             scope.sortBy = scope.sortBy === 'asc' ? 'desc' : 'asc';
-          }
-          else {
+          } else {
             scope.orderBy = dataName;
             scope.sortBy = 'desc';
           }
@@ -51,9 +58,7 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [function() {
             options.onSort(scope.orderBy, scope.sortBy);
           }
         }
-
-      }
-
+      };
     }
   };
-} ]);
+}]);
