@@ -31,6 +31,12 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [function() {
             options.totalItems = newValue;
           });
         }
+        // 初始化排序
+        angular.forEach([ 'orderBy', 'sortBy' ], function(key) {
+          if (angular.isDefined(attrs[key])) {
+            scope[key] = scope.$eval(attrs[key]);
+          }
+        });
         var list = element[0].querySelectorAll('th');
         for (var i = 0, len = list.length; i < len; i++) {
           var item = list[i];

@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-06-27
+ * @version v2.3.10 - 2017-10-13
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -32,6 +32,16 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [ function() {
             options[key] = scope.$eval(attrs[bsKey]);
           }
         });
+        if (angular.isDefined(attrs.totalItems)) {
+          attrs.$observe('totalItems', function(newValue) {
+            options.totalItems = newValue;
+          });
+        }
+        angular.forEach([ 'orderBy', 'sortBy' ], function(key) {
+          if (angular.isDefined(attrs[key])) {
+            scope[key] = scope.$eval(attrs[key]);
+          }
+        });
         var list = element[0].querySelectorAll('th');
         for (var i = 0, len = list.length; i < len; i++) {
           var item = list[i];
@@ -41,6 +51,9 @@ angular.module('mgcrea.ngStrap.sort', []).directive('bsSort', [ function() {
           }
         }
         function clickColumn(event) {
+          if (options.totalItems === -1) {
+            return;
+          }
           var target = angular.element(event.currentTarget);
           var dataName = target.attr('data-name');
           if (dataName === scope.orderBy) {

@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-06-27
+ * @version v2.3.10 - 2017-10-13
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -526,14 +526,14 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
         var endDate;
         if (angular.isUndefined(modelValue) || modelValue === null) {
           return '';
-        } else if (modelValue.startDate && modelValue.endDate) {
-          startDate = getFormattedDate(modelValue.startDate);
-          endDate = getFormattedDate(modelValue.endDate);
-          controller.$dateValue = [ dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone) ];
         } else if (modelValue.dateRange) {
           controller.$dateRange = modelValue.dateRange;
           controller.$dateValue = !controller.$dateValue ? [] : controller.$dateValue;
           rangedatepicker.$selectRange(controller.$dateRange);
+        } else if (modelValue.startDate && modelValue.endDate) {
+          startDate = getFormattedDate(modelValue.startDate);
+          endDate = getFormattedDate(modelValue.endDate);
+          controller.$dateValue = [ dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone) ];
         }
         controller.$compareDateValue = [];
         return getDateFormattedString();
