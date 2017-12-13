@@ -98,6 +98,7 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
           scope.$toggleCompare = function () {
             var modelValue = controller.$modelValue ? angular.copy(controller.$modelValue) : {};
             modelValue.compare = scope.ctrl.compare;
+            // 只变更了勾选compare
             modelValue.onlyCompare = true;
             controller.$setViewValue(modelValue);
             controller.$render();
@@ -117,8 +118,9 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
                 $rangedatepicker.$compareDate = [sDate, eDate];
               }
               $picker.update.call($picker, sDate, eDate);
+            } else {
+              $rangedatepicker.$build(!force);
             }
-            $rangedatepicker.$build(!force);
           };
           $rangedatepicker.updateDisabledDates = function (dateRanges) {
             options.disabledDateRanges = dateRanges;
@@ -160,19 +162,6 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             modelValue.onlyCompare = false;
             controller.$setViewValue(modelValue);
             controller.$render();
-            // set range
-            if (!scope.ctrl.compare) {
-              var flag = false;
-              scope.rangeList.forEach(function (item) {
-                if (item.date.start.toDateString() === modelValue.startDate.toDateString() && item.date.end.toDateString() === modelValue.endDate.toDateString()) {
-                  scope.ctrl.rangeType = item.value;
-                  flag = true;
-                }
-              });
-              if (!flag) {
-                scope.ctrl.rangeType = '';
-              }
-            }
             if (options.autoclose && !keep) {
               $timeout(function () {
                 $rangedatepicker.hide(true);
@@ -181,6 +170,9 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
           };
           $rangedatepicker.$getCompare = function () {
             return scope.ctrl && scope.ctrl.compare;
+          };
+          $rangedatepicker.$setCompare = function () {
+            scope.ctrl && (scope.ctrl.compare = 'compare');
           };
           $rangedatepicker.$build = function (pristine) {
             if (pristine === true && $picker.built) return;
@@ -251,8 +243,8 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
                 break;
             }
             if (angular.isDate(startDate) && angular.isDate(endDate)) {
-              controller.$dateValue[0] = new Date(startDate);
-              controller.$dateValue[1] = new Date(endDate);
+              controller.$dateValue[0] = angular.copy(startDate);
+              controller.$dateValue[1] = angular.copy(endDate);
               var modelValue = controller.$modelValue ? angular.copy(controller.$modelValue) : {};
               modelValue.startDate = angular.copy(startDate);
               modelValue.endDate = angular.copy(endDate);
@@ -365,9 +357,9 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
                 if (!isNaN(rangedatepicker.$options[key])) {
                   rangedatepicker.$build(false);
                 }
-                if (controller.$dateValue) {
-                  validateAgainstMinMaxDate(controller.$dateValue[0], controller.$dateValue[1]);
-                }
+                // if (controller.$dateValue) {
+                //   validateAgainstMinMaxDate(controller.$dateValue[0], controller.$dateValue[1]);
+                // }
               });
             }
           });
@@ -380,6 +372,7 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             if (newValue && newValue.onlyCompare) {
               rangedatepicker.update(null, null, true);
             } else if (rangedatepicker.$getCompare()) {
+              rangedatepicker.$date = [controller.$dateValue[0], controller.$dateValue[1]];
               rangedatepicker.update(controller.$compareDateValue[0], controller.$compareDateValue[1]);
             } else {
               rangedatepicker.update(controller.$dateValue[0], controller.$dateValue[1]);
@@ -458,13 +451,14 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             var skey = '';
             var ekey = '';
             if (compare) {
+              // 原对比日期需要显示，因此这里还是要赋值
               obj.startDate = viewValue.startDate;
               obj.endDate = viewValue.endDate;
               skey = 'compareStartDate';
               ekey = 'compareEndDate';
             } else {
-              // obj.compareStartDate = viewValue.compareStartDate;
-              // obj.compareEndDate = viewValue.compareEndDate;
+              obj.compareStartDate = viewValue.compareStartDate;
+              obj.compareEndDate = viewValue.compareEndDate;
               skey = 'startDate';
               ekey = 'endDate';
             }
@@ -498,30 +492,36 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             return obj;
           });
           controller.$formatters.push(function (modelValue) {
-            var startDate;
-            var endDate;
             if (angular.isUndefined(modelValue) || modelValue === null) {
               return '';
-            } else if (modelValue.dateRange) {
+            }
+            if (modelValue.dateRange) {
               controller.$dateRange = modelValue.dateRange;
               controller.$dateValue = !controller.$dateValue ? [] : controller.$dateValue;
               rangedatepicker.$selectRange(controller.$dateRange);
-            } else if (modelValue.startDate && modelValue.endDate) {
-              startDate = getFormattedDate(modelValue.startDate);
-              endDate = getFormattedDate(modelValue.endDate);
-              controller.$dateValue = [dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone)];
+            } else {
+              controller.$dateValue = [];
+              controller.$compareDateValue = [];
+              if (modelValue.startDate && modelValue.endDate) {
+                var startDate = getFormattedDate(modelValue.startDate);
+                var endDate = getFormattedDate(modelValue.endDate);
+                controller.$dateValue = [dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone)];
+              }
+              if (modelValue.compareStartDate && modelValue.compareEndDate) {
+                var compareStartDate = getFormattedDate(modelValue.compareStartDate);
+                var compareEndDate = getFormattedDate(modelValue.compareEndDate);
+                controller.$compareDateValue = [dateParser.timezoneOffsetAdjust(compareStartDate, options.timezone), dateParser.timezoneOffsetAdjust(compareEndDate, options.timezone)];
+                if (modelValue.compare) {
+                  rangedatepicker.$setCompare();
+                }
+              }
             }
-            controller.$compareDateValue = [];
-
             return getDateFormattedString();
           });
           controller.$render = function () {
             element.val(getDateFormattedString());
           };
           function getDateFormattedString () {
-            // return (!controller.$dateValue || controller.$dateValue.length === 0 || !controller.$dateValue[0] || !controller.$dateValue[1] ||
-            // isNaN(controller.$dateValue[0].getTime()) || isNaN(controller.$dateValue[1].getTime()))
-            //   ? '' : formatDate(controller.$dateValue[0], options.dateFormat) + options.connector + formatDate(controller.$dateValue[1], options.dateFormat);
             if (!controller.$modelValue || !controller.$modelValue.startDate || isNaN(controller.$modelValue.startDate.getTime())) {
               return '';
             }
@@ -635,6 +635,19 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             scope.showLabels = true;
             scope.labels = weekDaysLabelsHtml;
             scope.isTodayDisabled = this.isDisabled(new Date());
+            // set range
+            if (!scope.ctrl.compare) {
+              var flag = false;
+              scope.rangeList.forEach(function (item) {
+                if (item.date.start.toDateString() === picker.$date[0].toDateString() && item.date.end.toDateString() === picker.$date[1].toDateString()) {
+                  scope.ctrl.rangeType = item.value;
+                  flag = true;
+                }
+              });
+              if (!flag) {
+                scope.ctrl.rangeType = '';
+              }
+            }
             this.built = true;
           },
           isSelected: function (currentDate, date) {

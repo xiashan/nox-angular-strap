@@ -16,6 +16,17 @@ angular.module('mgcrea.ngStrapDocs')
       // endDate: new Date('2017/05/12'),
       dateRange: '-2d'
     };
+    $scope.rangeDate = {
+      startDate: new Date('2017/12/11'),
+      endDate: new Date('2017/12/11'),
+    };
+    $scope.compareDate = {
+      startDate: new Date('2017/12/04'),
+      endDate: new Date('2017/12/04'),
+      compareStartDate: new Date('2017/12/09'),
+      compareEndDate: new Date('2017/12/09'),
+      compare: true,
+    };
     $scope.maxDate = new Date();
     $scope.minDate = new Date('2017/03/01');
     // number

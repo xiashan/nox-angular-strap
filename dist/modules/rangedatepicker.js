@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-10-13
+ * @version v2.3.10 - 2017-12-13
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -145,8 +145,9 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             $rangedatepicker.$compareDate = [ sDate, eDate ];
           }
           $picker.update.call($picker, sDate, eDate);
+        } else {
+          $rangedatepicker.$build(!force);
         }
-        $rangedatepicker.$build(!force);
       };
       $rangedatepicker.updateDisabledDates = function(dateRanges) {
         options.disabledDateRanges = dateRanges;
@@ -188,18 +189,6 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
         modelValue.onlyCompare = false;
         controller.$setViewValue(modelValue);
         controller.$render();
-        if (!scope.ctrl.compare) {
-          var flag = false;
-          scope.rangeList.forEach(function(item) {
-            if (item.date.start.toDateString() === modelValue.startDate.toDateString() && item.date.end.toDateString() === modelValue.endDate.toDateString()) {
-              scope.ctrl.rangeType = item.value;
-              flag = true;
-            }
-          });
-          if (!flag) {
-            scope.ctrl.rangeType = '';
-          }
-        }
         if (options.autoclose && !keep) {
           $timeout(function() {
             $rangedatepicker.hide(true);
@@ -208,6 +197,9 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
       };
       $rangedatepicker.$getCompare = function() {
         return scope.ctrl && scope.ctrl.compare;
+      };
+      $rangedatepicker.$setCompare = function() {
+        scope.ctrl && (scope.ctrl.compare = 'compare');
       };
       $rangedatepicker.$build = function(pristine) {
         if (pristine === true && $picker.built) return;
@@ -281,8 +273,8 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
           break;
         }
         if (angular.isDate(startDate) && angular.isDate(endDate)) {
-          controller.$dateValue[0] = new Date(startDate);
-          controller.$dateValue[1] = new Date(endDate);
+          controller.$dateValue[0] = angular.copy(startDate);
+          controller.$dateValue[1] = angular.copy(endDate);
           var modelValue = controller.$modelValue ? angular.copy(controller.$modelValue) : {};
           modelValue.startDate = angular.copy(startDate);
           modelValue.endDate = angular.copy(endDate);
@@ -392,9 +384,6 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             if (!isNaN(rangedatepicker.$options[key])) {
               rangedatepicker.$build(false);
             }
-            if (controller.$dateValue) {
-              validateAgainstMinMaxDate(controller.$dateValue[0], controller.$dateValue[1]);
-            }
           });
         }
       });
@@ -407,6 +396,7 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
         if (newValue && newValue.onlyCompare) {
           rangedatepicker.update(null, null, true);
         } else if (rangedatepicker.$getCompare()) {
+          rangedatepicker.$date = [ controller.$dateValue[0], controller.$dateValue[1] ];
           rangedatepicker.update(controller.$compareDateValue[0], controller.$compareDateValue[1]);
         } else {
           rangedatepicker.update(controller.$dateValue[0], controller.$dateValue[1]);
@@ -489,6 +479,8 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
           skey = 'compareStartDate';
           ekey = 'compareEndDate';
         } else {
+          obj.compareStartDate = viewValue.compareStartDate;
+          obj.compareEndDate = viewValue.compareEndDate;
           skey = 'startDate';
           ekey = 'endDate';
         }
@@ -522,20 +514,30 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
         return obj;
       });
       controller.$formatters.push(function(modelValue) {
-        var startDate;
-        var endDate;
         if (angular.isUndefined(modelValue) || modelValue === null) {
           return '';
-        } else if (modelValue.dateRange) {
+        }
+        if (modelValue.dateRange) {
           controller.$dateRange = modelValue.dateRange;
           controller.$dateValue = !controller.$dateValue ? [] : controller.$dateValue;
           rangedatepicker.$selectRange(controller.$dateRange);
-        } else if (modelValue.startDate && modelValue.endDate) {
-          startDate = getFormattedDate(modelValue.startDate);
-          endDate = getFormattedDate(modelValue.endDate);
-          controller.$dateValue = [ dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone) ];
+        } else {
+          controller.$dateValue = [];
+          controller.$compareDateValue = [];
+          if (modelValue.startDate && modelValue.endDate) {
+            var startDate = getFormattedDate(modelValue.startDate);
+            var endDate = getFormattedDate(modelValue.endDate);
+            controller.$dateValue = [ dateParser.timezoneOffsetAdjust(startDate, options.timezone), dateParser.timezoneOffsetAdjust(endDate, options.timezone) ];
+          }
+          if (modelValue.compareStartDate && modelValue.compareEndDate) {
+            var compareStartDate = getFormattedDate(modelValue.compareStartDate);
+            var compareEndDate = getFormattedDate(modelValue.compareEndDate);
+            controller.$compareDateValue = [ dateParser.timezoneOffsetAdjust(compareStartDate, options.timezone), dateParser.timezoneOffsetAdjust(compareEndDate, options.timezone) ];
+            if (modelValue.compare) {
+              rangedatepicker.$setCompare();
+            }
+          }
         }
-        controller.$compareDateValue = [];
         return getDateFormattedString();
       });
       controller.$render = function() {
@@ -653,6 +655,18 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
           scope.showLabels = true;
           scope.labels = weekDaysLabelsHtml;
           scope.isTodayDisabled = this.isDisabled(new Date());
+          if (!scope.ctrl.compare) {
+            var flag = false;
+            scope.rangeList.forEach(function(item) {
+              if (item.date.start.toDateString() === picker.$date[0].toDateString() && item.date.end.toDateString() === picker.$date[1].toDateString()) {
+                scope.ctrl.rangeType = item.value;
+                flag = true;
+              }
+            });
+            if (!flag) {
+              scope.ctrl.rangeType = '';
+            }
+          }
           this.built = true;
         },
         isSelected: function(currentDate, date) {

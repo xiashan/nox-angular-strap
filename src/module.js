@@ -6,6 +6,7 @@ angular.module('mgcrea.ngStrap', [
   'mgcrea.ngStrap.datepicker',
   'mgcrea.ngStrap.rangedatepicker',
   'mgcrea.ngStrap.timepicker',
+  'mgcrea.ngStrap.datetimepicker',
   'mgcrea.ngStrap.tooltip',
   'mgcrea.ngStrap.popover',
   'mgcrea.ngStrap.dropdown',

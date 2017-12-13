@@ -35,6 +35,14 @@ $scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
         <label class="control-label"><i class="fa fa-calendar"></i> Date <small>(as date)</small></label>
         <input type="text" class="form-control" ng-model="selectedDate"  name="date" data-min-date="{{minDate}}" data-max-date="today" readonly="readonly" bs-rangedatepicker>
       </div>
+      <div class="form-group" ng-class="{'has-error': datepickerForm.rangeDate.$invalid}">
+        <label class="control-label"><i class="fa fa-calendar"></i> startDate ~ endDate</label>
+        <input type="text" class="form-control" ng-model="rangeDate" name="rangeDate" data-min-date="{{minDate}}" data-max-date="today" readonly="readonly" bs-rangedatepicker>
+      </div>
+      <div class="form-group" ng-class="{'has-error': datepickerForm.compareDate.$invalid}">
+        <label class="control-label"><i class="fa fa-calendar"></i> compareDate</label>
+        <input type="text" class="form-control" ng-model="compareDate" name="compareDate" data-min-date="{{minDate}}" data-max-date="today" readonly="readonly" bs-rangedatepicker>
+      </div>
       <!-- Custom example -->
       <!--<div class="form-group" ng-class="{'has-error': datepickerForm.date2.$invalid}">-->
         <!--<label class="control-label"><i class="fa fa-calendar"></i> Date <small>(as number)</small></label>-->
