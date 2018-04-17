@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-12-13
+ * @version v2.3.10 - 2018-04-17
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -329,7 +329,7 @@
             } else if (trigger !== 'manual') {
               element.on(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.on(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover') {
+              if (nodeName === 'button' && trigger !== 'hover' || nodeName === 'input') {
                 element.on(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -344,7 +344,7 @@
             } else if (trigger !== 'manual') {
               element.off(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.off(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover') {
+              if (nodeName === 'button' && trigger !== 'hover' || nodeName === 'input') {
                 element.off(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -1355,6 +1355,8 @@
       delay: 0,
       multiple: false,
       allNoneButtons: false,
+      autoClose: false,
+      search: false,
       sort: true,
       caretHtml: '&nbsp;<span class="select-arrow"><i class="nox-sort-down"></i></span>',
       placeholder: 'Choose among the following...',
@@ -1381,9 +1383,23 @@
         }
         scope.$isMultiple = options.multiple;
         scope.$showAllNoneButtons = options.allNoneButtons && options.multiple;
+        scope.$showSearch = options.search;
         scope.$iconCheckmark = options.iconCheckmark;
         scope.$allText = options.allText;
         scope.$noneText = options.noneText;
+        scope.$searchText = '';
+        scope.$changeSearchText = function(evt) {
+          evt.preventDefault();
+          evt.stopPropagation();
+        };
+        scope.$close = function() {
+          scope.$$postDigest(function() {
+            $select.hide(true);
+          });
+        };
+        scope.$searchTextChange = function(evt) {
+          scope.searchText = evt.searchText;
+        };
         scope.$activate = function(index) {
           scope.$$postDigest(function() {
             $select.activate(index);
@@ -1391,7 +1407,7 @@
         };
         scope.$select = function(index, evt) {
           scope.$$postDigest(function() {
-            $select.select(index);
+            $select.select(index, evt);
           });
         };
         scope.$isVisible = function() {
@@ -1433,7 +1449,7 @@
           }
           return scope.$activeIndex;
         };
-        $select.select = function(index) {
+        $select.select = function(index, evt) {
           if (angular.isUndefined(index) || index < 0 || index >= scope.$matches.length) {
             return;
           }
@@ -1498,8 +1514,12 @@
           return index;
         };
         $select.$onMouseDown = function(evt) {
-          evt.preventDefault();
-          evt.stopPropagation();
+          evt.preventDefault(true);
+          evt.stopPropagation(true);
+          if (evt.target.getAttribute('role') === 'search') {
+            evt.target.focus();
+            scope.searchText = '';
+          }
           if (isTouch) {
             var targetEl = angular.element(evt.target);
             var anchor;
@@ -1517,7 +1537,7 @@
             } else {
               targetEl.triggerHandler('click');
             }
-          }
+          } else {}
         };
         $select.$onKeyDown = function(evt) {
           if (!/(9|13|38|40)/.test(evt.keyCode)) return;
@@ -1565,6 +1585,9 @@
           if (!options.multiple && angular.isUndefined(controller.$modelValue)) {
             scope.$activeIndex = -1;
           }
+          if (options.search) {
+            scope.searchText = '';
+          }
           $select.$element.off(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
           if (options.keyboard) {
             element.off('keydown', $select.$onKeyDown);
@@ -1586,11 +1609,11 @@
           scope: scope,
           placeholder: defaults.placeholder
         };
-        angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'placement', 'container', 'delay', 'trigger', 'keyboard', 'html', 'animation', 'placeholder', 'allNoneButtons', 'maxLength', 'maxLengthHtml', 'allText', 'noneText', 'iconCheckmark', 'autoClose', 'id', 'sort', 'caretHtml', 'prefixClass', 'prefixEvent', 'toggle' ], function(key) {
+        angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'placement', 'container', 'delay', 'trigger', 'keyboard', 'html', 'animation', 'placeholder', 'allNoneButtons', 'maxLength', 'maxLengthHtml', 'allText', 'noneText', 'iconCheckmark', 'autoClose', 'id', 'sort', 'search', 'caretHtml', 'prefixClass', 'prefixEvent', 'toggle' ], function(key) {
           if (angular.isDefined(attr[key])) options[key] = attr[key];
         });
         var falseValueRegExp = /^(false|0|)$/i;
-        angular.forEach([ 'html', 'container', 'allNoneButtons', 'sort' ], function(key) {
+        angular.forEach([ 'html', 'container', 'allNoneButtons', 'sort', 'search' ], function(key) {
           if (angular.isDefined(attr[key]) && falseValueRegExp.test(attr[key])) {
             options[key] = false;
           }
@@ -1607,6 +1630,15 @@
             options.multiple = false;
           } else {
             options.multiple = dataMultiple;
+          }
+        }
+        var dataSearch = element.attr('data-search');
+        if (angular.isDefined(dataSearch)) {
+          if (falseValueRegExp.test(dataSearch)) {
+            options.search = false;
+          } else {
+            options.search = dataSearch;
+            scope.searchText = '';
           }
         }
         if (element[0].nodeName.toLowerCase() === 'select') {
@@ -1628,10 +1660,12 @@
           });
         }, true);
         scope.$watch(attr.ngModel, function(newValue, oldValue) {
+          console.warn('scope.$watch(%s)', attr.ngModel, newValue, oldValue);
           select.$updateActiveIndex();
           controller.$render();
         }, true);
         controller.$render = function() {
+          console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
           var selected;
           var index;
           if (options.multiple && angular.isArray(controller.$modelValue)) {
@@ -1662,7 +1696,17 @@
         });
       }
     };
-  } ]);
+  } ]).filter('searchFilter', function() {
+    return function(collection, keyname, value) {
+      var output = [];
+      angular.forEach(collection, function(item) {
+        if (item[keyname].indexOf(value) > -1) {
+          output.push(item);
+        }
+      });
+      return output;
+    };
+  });
   angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateParser', 'mgcrea.ngStrap.helpers.dateFormatter', 'mgcrea.ngStrap.tooltip' ]).provider('$rangedatepicker', function() {
     var defaults = this.defaults = {
       animation: 'am-fade',
@@ -1705,58 +1749,16 @@
         var options = $rangedatepicker.$options;
         var scope = $rangedatepicker.$scope;
         var pickerViews = rangedatepickerViews($rangedatepicker);
-        $rangedatepicker.$view = pickerViews.view;
+        $rangedatepicker.$views = pickerViews.views;
         var viewDate = pickerViews.viewDate;
+        scope.$mode = options.minView;
         scope.$iconLeft = options.iconLeft;
         scope.$iconRight = options.iconRight;
         scope.$compare = options.compare;
-        var $picker = $rangedatepicker.$view;
+        var $picker = $rangedatepicker.$views[0];
+        scope.rangeList = $picker.rangeList;
         var today = new Date();
-        var t = $rangedatepicker.$today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        var d = today.getDay();
-        scope.rangeList = [ {
-          name: 'Today',
-          value: '0d',
-          date: {
-            start: t,
-            end: t
-          }
-        }, {
-          name: 'Yesterday',
-          value: '-2d',
-          date: {
-            start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1),
-            end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1)
-          }
-        }, {
-          name: 'Last 7 Days',
-          value: '-7d',
-          date: {
-            start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6),
-            end: t
-          }
-        }, {
-          name: 'Last Week',
-          value: '-1w',
-          date: {
-            start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6 - d),
-            end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - d)
-          }
-        }, {
-          name: 'This Month',
-          value: '0m',
-          date: {
-            start: new Date(t.getFullYear(), t.getMonth(), 1),
-            end: t
-          }
-        }, {
-          name: 'Last Month',
-          value: '-1m',
-          date: {
-            start: new Date(t.getFullYear(), t.getMonth() - 1, 1),
-            end: new Date(t.getFullYear(), t.getMonth(), 0)
-          }
-        } ];
+        $rangedatepicker.$today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         scope.ctrl = {
           rangeType: '',
           compare: ''
@@ -1918,7 +1920,7 @@
               startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
             } else if (value < 0) {
               startDate = new Date(endDate.getFullYear(), endDate.getMonth() + value, 1);
-              endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
+              endDate = new Date(endDate.getFullYear(), endDate.getMonth() + value + 1, 0);
             } else {
               startDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 1);
               endDate = new Date(endDate.getFullYear(), endDate.getMonth() + value + 1, 0);
@@ -2259,12 +2261,58 @@
             date: endDate.getDate()
           }
         };
-        var view = {
+        var today = new Date();
+        var t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var d = today.getDay();
+        var views = [ {
           format: options.dayFormat,
           split: 7,
           steps: {
             month: 1
           },
+          rangeList: [ {
+            name: 'Today',
+            value: '0d',
+            date: {
+              start: t,
+              end: t
+            }
+          }, {
+            name: 'Yesterday',
+            value: '-2d',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1),
+              end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1)
+            }
+          }, {
+            name: 'Last 7 Days',
+            value: '-7d',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6),
+              end: t
+            }
+          }, {
+            name: 'Last Week',
+            value: '-1w',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6 - d),
+              end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - d)
+            }
+          }, {
+            name: 'This Month',
+            value: '0m',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth(), 1),
+              end: t
+            }
+          }, {
+            name: 'Last Month',
+            value: '-1m',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth() - 1, 1),
+              end: new Date(t.getFullYear(), t.getMonth(), 0)
+            }
+          } ],
           update: function(sDate, eDate, force) {
             viewDate.startDate = {
               year: sDate.getFullYear(),
@@ -2288,7 +2336,7 @@
               var firstDayOfMonthOffset = firstDayOfMonth.getTimezoneOffset();
               var firstDate = new Date(+firstDayOfMonth - mod(firstDayOfMonth.getDay() - options.startWeek, 7) * 864e5);
               var firstDateOffset = firstDate.getTimezoneOffset();
-              var today = dateParser.timezoneOffsetAdjust(new Date(), options.timezone).toDateString();
+              var currentDate = dateParser.timezoneOffsetAdjust(new Date(), options.timezone).toDateString();
               if (firstDateOffset !== firstDayOfMonthOffset) firstDate = new Date(+firstDate + (firstDateOffset - firstDayOfMonthOffset) * 6e4);
               var days = [];
               var day;
@@ -2296,7 +2344,7 @@
                 day = dateParser.daylightSavingAdjust(new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() + i));
                 days.push({
                   date: day,
-                  isToday: day.toDateString() === today,
+                  isToday: day.toDateString() === currentDate,
                   label: formatDate(day, that.format),
                   selected: picker.$date && picker.$date[index] && (!picker.$getCompare() || picker.$getCompare() && !index) && that.isSelected(picker.$date[index], day),
                   inRange: that.isInRange(day),
@@ -2313,7 +2361,7 @@
             scope.isTodayDisabled = this.isDisabled(new Date());
             if (!scope.ctrl.compare) {
               var flag = false;
-              scope.rangeList.forEach(function(item) {
+              that.rangeList.forEach(function(item) {
                 if (item.date.start.toDateString() === picker.$date[0].toDateString() && item.date.end.toDateString() === picker.$date[1].toDateString()) {
                   scope.ctrl.rangeType = item.value;
                   flag = true;
@@ -2359,9 +2407,109 @@
             }
             return false;
           }
-        };
+        }, {
+          name: 'month',
+          format: options.monthFormat,
+          split: 4,
+          steps: {
+            year: 1
+          },
+          rangeList: [ {
+            name: 'This Month',
+            value: '0m',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth(), 1),
+              end: t
+            }
+          }, {
+            name: 'Last Month',
+            value: '-1m',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth() - 1, 1),
+              end: new Date(t.getFullYear(), t.getMonth(), 0)
+            }
+          }, {
+            name: 'Two Months Ago',
+            value: '-2m',
+            date: {
+              start: new Date(t.getFullYear(), t.getMonth() - 2, 1),
+              end: new Date(t.getFullYear(), t.getMonth() - 1, 0)
+            }
+          } ],
+          update: function(sDate, eDate, force) {
+            viewDate.startDate = {
+              year: sDate.getFullYear(),
+              month: sDate.getMonth(),
+              date: sDate.getDate()
+            };
+            viewDate.endDate = {
+              year: eDate.getFullYear(),
+              month: eDate.getMonth(),
+              date: eDate.getDate()
+            };
+            picker.$build();
+          },
+          build: function() {
+            var that = this;
+            scope.title = [];
+            scope.rows = [];
+            [ 'startDate', 'endDate' ].forEach(function(value, index) {
+              var months = [];
+              var month;
+              for (var i = 0; i < 12; i++) {
+                month = new Date(viewDate[value].year, i, 1);
+                months.push({
+                  date: month,
+                  label: formatDate(month, that.format),
+                  selected: picker.$date && picker.$date[index] && (!picker.$getCompare() || picker.$getCompare() && !index) && that.isSelected(picker.$date[index], month),
+                  inRange: that.isInRange(month),
+                  disabled: index === 1 && scope.ctrl.compare || that.isDisabled(month, index),
+                  compareSelect: index === 0 && scope.ctrl.compare && picker.$compareDate && picker.$compareDate[index] && that.isSelected(picker.$compareDate[index], month)
+                });
+              }
+              scope.title[index] = formatDate(month, options.yearTitleFormat);
+              scope.rows[index] = split(months, that.split);
+            });
+            scope.showLabels = false;
+            if (!scope.ctrl.compare) {
+              var flag = false;
+              that.rangeList.forEach(function(item) {
+                if (item.date.start.toDateString() === picker.$date[0].toDateString() && item.date.end.toDateString() === picker.$date[1].toDateString()) {
+                  scope.ctrl.rangeType = item.value;
+                  flag = true;
+                }
+              });
+              if (!flag) {
+                scope.ctrl.rangeType = '';
+              }
+            }
+            this.built = true;
+          },
+          isSelected: function(currentDate, date) {
+            return currentDate && date.getFullYear() === currentDate.getFullYear() && date.getMonth() === currentDate.getMonth();
+          },
+          isInRange: function(date) {
+            if (!picker.$date || picker.$getCompare()) {
+              return false;
+            }
+            var minDate = picker.$date[0];
+            var maxDate = picker.$date[1];
+            if (!angular.isDate(minDate) || !angular.isDate(maxDate) || !angular.isDate(date)) {
+              return false;
+            }
+            return date.getTime() >= minDate.getTime() && date.getTime() <= maxDate.getTime();
+          },
+          isDisabled: function(date, index) {
+            var time = date.getTime();
+            var lastDate = +new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            if (lastDate < options.minDate || date.getTime() > options.maxDate) {
+              return true;
+            }
+            return !scope.ctrl.compare && picker.$date && (index && time < picker.$date[index - 1] || time > picker.$date[index + 1]);
+          }
+        } ];
         return {
-          view: view,
+          views: Array.prototype.slice.call(views, options.minView, options.minView + 1),
           viewDate: viewDate
         };
       };

@@ -27,10 +27,17 @@ $scope.icons = {{icons}};
       Action <span class="caret"></span>
     </button>
     <hr>
-    <label>Multiple select:&nbsp;</label>
-    <button type="button" class="btn btn-default" ng-model="selectedIcons" data-html="1" data-multiple="1" data-animation="am-flip-x" bs-options="icon.value as icon.label for icon in icons" bs-select>
+    <label>Single select search:&nbsp;</label>
+    <button type="button" class="btn btn-default" ng-model="selectedIcon" data-html="1" data-toggle="true" data-trigger="click" data-search="true" bs-options="icon.value as icon.label for icon in icons" bs-select>
       Action <span class="caret"></span>
     </button>
+    <hr>
+    <label>Multiple select:&nbsp;</label>
+    <button type="button" class="btn btn-default" ng-model="selectedIcons" data-html="1" data-trigger="click" data-multiple="1" data-search="true" data-animation="am-flip-x"
+            bs-options="icon.id as icon.text for icon in contentBody"  bs-select>
+      Action <span class="caret"></span>
+    </button>
+
   </div>
 
 

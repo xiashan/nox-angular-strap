@@ -17,6 +17,8 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
       delay: 0,
       multiple: false,
       allNoneButtons: false,
+      autoClose: false,
+      search: false,
       sort: true,
       caretHtml: '&nbsp;<span class="select-arrow"><i class="nox-sort-down"></i></span>',
       placeholder: 'Choose among the following...',
@@ -52,9 +54,29 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
         }
         scope.$isMultiple = options.multiple;
         scope.$showAllNoneButtons = options.allNoneButtons && options.multiple;
+        scope.$showSearch = options.search; // 单选复选都可以search
+        // scope.$trigger = options.search?true:false;
         scope.$iconCheckmark = options.iconCheckmark;
         scope.$allText = options.allText;
         scope.$noneText = options.noneText;
+
+        scope.$searchText = '';
+
+
+        scope.$changeSearchText = function (evt) {
+          evt.preventDefault();
+          evt.stopPropagation();
+
+        };
+        scope.$close = function () {
+          scope.$$postDigest(function () {
+            $select.hide(true);
+          });
+        };
+        scope.$searchTextChange = function (evt) {
+          scope.searchText = evt.searchText;
+
+        };
 
         scope.$activate = function (index) {
           scope.$$postDigest(function () {
@@ -64,7 +86,7 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
 
         scope.$select = function (index, evt) {
           scope.$$postDigest(function () {
-            $select.select(index);
+            $select.select(index, evt);
           });
         };
 
@@ -83,7 +105,6 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
             }
           }
         };
-
         scope.$selectNone = function () {
           for (var i = 0; i < scope.$matches.length; i++) {
             if (scope.$isActive(i)) {
@@ -113,7 +134,7 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
           return scope.$activeIndex;
         };
 
-        $select.select = function (index) {
+        $select.select = function (index, evt) {
           if (angular.isUndefined(index) || index < 0 || index >= scope.$matches.length) { return; }
           var value = scope.$matches[index].value;
           scope.$apply(function () {
@@ -140,6 +161,7 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
           if (angular.isDefined(options.onSelect) && angular.isFunction(options.onSelect)) {
             options.onSelect(value, index, $select);
           }
+          // scope.searchText = '';
         };
 
         // Protected methods
@@ -187,9 +209,14 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
 
         $select.$onMouseDown = function (evt) {
           // Prevent blur on mousedown on .dropdown-menu
-          evt.preventDefault();
-          evt.stopPropagation();
           // Emulate click for mobile devices
+          evt.preventDefault(true);
+          evt.stopPropagation(true);
+
+          if (evt.target.getAttribute('role') === 'search') {
+            evt.target.focus();
+            scope.searchText = '';
+          }
           if (isTouch) {
             var targetEl = angular.element(evt.target);
             var anchor;
@@ -209,7 +236,11 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
             } else {
               targetEl.triggerHandler('click');
             }
+          } else {
+            // console.log('no touch');
           }
+
+
         };
 
         $select.$onKeyDown = function (evt) {
@@ -276,6 +307,11 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
           if (!options.multiple && angular.isUndefined(controller.$modelValue)) {
             scope.$activeIndex = -1;
           }
+          if (options.search) {
+            // search 清空
+            scope.searchText = '';
+           // return;
+          }
           $select.$element.off(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
           if (options.keyboard) {
             element.off('keydown', $select.$onKeyDown);
@@ -305,13 +341,14 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
 
         // Directive options
         var options = {scope: scope, placeholder: defaults.placeholder};
-        angular.forEach(['template', 'templateUrl', 'controller', 'controllerAs', 'placement', 'container', 'delay', 'trigger', 'keyboard', 'html', 'animation', 'placeholder', 'allNoneButtons', 'maxLength', 'maxLengthHtml', 'allText', 'noneText', 'iconCheckmark', 'autoClose', 'id', 'sort', 'caretHtml', 'prefixClass', 'prefixEvent', 'toggle'], function (key) {
+        angular.forEach(['template', 'templateUrl', 'controller', 'controllerAs', 'placement', 'container', 'delay', 'trigger', 'keyboard', 'html', 'animation', 'placeholder', 'allNoneButtons', 'maxLength', 'maxLengthHtml', 'allText', 'noneText', 'iconCheckmark', 'autoClose', 'id',
+          'sort', 'search', 'caretHtml', 'prefixClass', 'prefixEvent', 'toggle'], function (key) {
           if (angular.isDefined(attr[key])) options[key] = attr[key];
         });
 
         // use string regex match boolean attr falsy values, leave truthy values be
         var falseValueRegExp = /^(false|0|)$/i;
-        angular.forEach(['html', 'container', 'allNoneButtons', 'sort'], function (key) {
+        angular.forEach(['html', 'container', 'allNoneButtons', 'sort', 'search'], function (key) {
           if (angular.isDefined(attr[key]) && falseValueRegExp.test(attr[key])) {
             options[key] = false;
           }
@@ -333,6 +370,17 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
             options.multiple = false;
           } else {
             options.multiple = dataMultiple;
+          }
+        }
+
+        // search
+        var dataSearch = element.attr('data-search');
+        if (angular.isDefined(dataSearch)) {
+          if (falseValueRegExp.test(dataSearch)) {
+            options.search = false;
+          } else {
+            options.search = dataSearch;
+            scope.searchText = '';
           }
         }
 
@@ -367,14 +415,14 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
 
         // Watch model for changes
         scope.$watch(attr.ngModel, function (newValue, oldValue) {
-          // console.warn('scope.$watch(%s)', attr.ngModel, newValue, oldValue);
+          console.warn('scope.$watch(%s)', attr.ngModel, newValue, oldValue);
           select.$updateActiveIndex();
           controller.$render();
         }, true);
 
         // Model rendering in view
         controller.$render = function () {
-          // console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
+          console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
           var selected;
           var index;
           if (options.multiple && angular.isArray(controller.$modelValue)) {
@@ -410,4 +458,16 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
       }
     };
 
+  })
+  .filter('searchFilter', function () {
+    return function (collection, keyname, value) {
+      var output = [];
+      angular.forEach(collection, function (item) {
+        // 过滤数组中值与指定值相同的元素
+        if (item[keyname].indexOf(value) > -1) {
+          output.push(item);
+        }
+      });
+      return output;
+    };
   });

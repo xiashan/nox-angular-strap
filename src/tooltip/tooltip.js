@@ -442,7 +442,8 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
             } else if (trigger !== 'manual') {
               element.on(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.on(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover') {
+
+              if (nodeName === 'button' && trigger !== 'hover' || (nodeName === 'input')) {
                 element.on(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -458,7 +459,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
             } else if (trigger !== 'manual') {
               element.off(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.off(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover') {
+              if (nodeName === 'button' && trigger !== 'hover' || (nodeName === 'input')) {
                 element.off(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -810,6 +811,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
         });
 
         // Support scope as an object
+
         if (attr.bsTooltip) {
           scope.$watch(attr.bsTooltip, function (newValue, oldValue) {
             if (angular.isObject(newValue)) {

@@ -11,6 +11,11 @@ angular.module('mgcrea.ngStrapDocs')
 
   .controller('RangeDatepickerDemoCtrl', function ($scope, $http) {
 
+    $scope.selectedMonth = {
+      // startDate: new Date('2017/04/05'),
+      // endDate: new Date('2017/05/12'),
+      dateRange: '-1m'
+    };
     $scope.selectedDate = {
       // startDate: new Date('2017/04/05'),
       // endDate: new Date('2017/05/12'),
@@ -27,7 +32,8 @@ angular.module('mgcrea.ngStrapDocs')
       compareEndDate: new Date('2017/12/09'),
       compare: true,
     };
-    $scope.maxDate = new Date();
+    var today = new Date();
+    $scope.maxDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     $scope.minDate = new Date('2017/03/01');
     // number
     $scope.selectedDateAsNumber = Date.UTC(1986, 1, 22);

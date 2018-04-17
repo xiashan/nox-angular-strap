@@ -295,3 +295,17 @@ input[type="checkbox"] {
     max-height: 0px;
   }
 }
+.select-search-container{
+  padding:0 8px;
+  margin-bottom:8px;
+
+}
+.select-search-container input{
+  width:100%;
+}
+.select-close-container{
+  padding:8px;
+}
+.select-close-container .btn-close{
+  width:100%;
+}

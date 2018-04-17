@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2017-12-13
+ * @version v2.3.10 - 2018-04-17
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -328,7 +328,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
           } else if (trigger !== 'manual') {
             element.on(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
             element.on(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-            if (nodeName === 'button' && trigger !== 'hover') {
+            if (nodeName === 'button' && trigger !== 'hover' || nodeName === 'input') {
               element.on(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
             }
           }
@@ -343,7 +343,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
           } else if (trigger !== 'manual') {
             element.off(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
             element.off(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-            if (nodeName === 'button' && trigger !== 'hover') {
+            if (nodeName === 'button' && trigger !== 'hover' || nodeName === 'input') {
               element.off(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
             }
           }

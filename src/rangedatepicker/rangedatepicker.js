@@ -48,25 +48,17 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
           var options = $rangedatepicker.$options;
           var scope = $rangedatepicker.$scope;
           var pickerViews = rangedatepickerViews($rangedatepicker);
-          $rangedatepicker.$view = pickerViews.view;
+          $rangedatepicker.$views = pickerViews.views;
           var viewDate = pickerViews.viewDate;
+          scope.$mode = options.minView;
           scope.$iconLeft = options.iconLeft;
           scope.$iconRight = options.iconRight;
           scope.$compare = options.compare;
-          var $picker = $rangedatepicker.$view;
+          var $picker = $rangedatepicker.$views[0];
+          scope.rangeList = $picker.rangeList;
 
           var today = new Date();
-          var t = $rangedatepicker.$today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-          var d = today.getDay();
-
-          scope.rangeList = [
-            {name: 'Today', value: '0d', date: {start: t, end: t}},
-            {name: 'Yesterday', value: '-2d', date: {start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1), end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1)}},
-            {name: 'Last 7 Days', value: '-7d', date: {start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6), end: t}},
-            {name: 'Last Week', value: '-1w', date: {start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6 - d), end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - d)}},
-            {name: 'This Month', value: '0m', date: {start: new Date(t.getFullYear(), t.getMonth(), 1), end: t}},
-            {name: 'Last Month', value: '-1m', date: {start: new Date(t.getFullYear(), t.getMonth() - 1, 1), end: new Date(t.getFullYear(), t.getMonth(), 0)}}
-          ];
+          $rangedatepicker.$today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
           // 区间
           scope.ctrl = {
@@ -233,7 +225,8 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
                   startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
                 } else if (value < 0) {
                   startDate = new Date(endDate.getFullYear(), endDate.getMonth() + value, 1);
-                  endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
+                  // 一月一月的看，并不做区间
+                  endDate = new Date(endDate.getFullYear(), endDate.getMonth() + value + 1, 0);
                 } else {
                   startDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 1);
                   endDate = new Date(endDate.getFullYear(), endDate.getMonth() + value + 1, 0);
@@ -583,12 +576,24 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             date: endDate.getDate()
           }
         };
-        var view = {
+
+        var today = new Date();
+        var t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var d = today.getDay();
+        var views = [{
           format: options.dayFormat,
           split: 7,
           steps: {
             month: 1
           },
+          rangeList: [
+            {name: 'Today', value: '0d', date: {start: t, end: t}},
+            {name: 'Yesterday', value: '-2d', date: {start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1), end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1)}},
+            {name: 'Last 7 Days', value: '-7d', date: {start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6), end: t}},
+            {name: 'Last Week', value: '-1w', date: {start: new Date(t.getFullYear(), t.getMonth(), t.getDate() - 6 - d), end: new Date(t.getFullYear(), t.getMonth(), t.getDate() - d)}},
+            {name: 'This Month', value: '0m', date: {start: new Date(t.getFullYear(), t.getMonth(), 1), end: t}},
+            {name: 'Last Month', value: '-1m', date: {start: new Date(t.getFullYear(), t.getMonth() - 1, 1), end: new Date(t.getFullYear(), t.getMonth(), 0)}}
+          ],
           update: function (sDate, eDate, force) {
             viewDate.startDate = {
               year: sDate.getFullYear(),
@@ -612,7 +617,7 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
               var firstDayOfMonthOffset = firstDayOfMonth.getTimezoneOffset();
               var firstDate = new Date(+firstDayOfMonth - mod(firstDayOfMonth.getDay() - options.startWeek, 7) * 864e5);
               var firstDateOffset = firstDate.getTimezoneOffset();
-              var today = dateParser.timezoneOffsetAdjust(new Date(), options.timezone).toDateString();
+              var currentDate = dateParser.timezoneOffsetAdjust(new Date(), options.timezone).toDateString();
               if (firstDateOffset !== firstDayOfMonthOffset) firstDate = new Date(+firstDate + (firstDateOffset - firstDayOfMonthOffset) * 6e4);
               var days = [];
               var day;
@@ -620,7 +625,7 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
                 day = dateParser.daylightSavingAdjust(new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() + i));
                 days.push({
                   date: day,
-                  isToday: day.toDateString() === today,
+                  isToday: day.toDateString() === currentDate,
                   label: formatDate(day, that.format),
                   selected: picker.$date && picker.$date[index] && (!picker.$getCompare() || (picker.$getCompare() && !index)) && that.isSelected(picker.$date[index], day),
                   inRange: that.isInRange(day),
@@ -638,7 +643,7 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             // set range
             if (!scope.ctrl.compare) {
               var flag = false;
-              scope.rangeList.forEach(function (item) {
+              that.rangeList.forEach(function (item) {
                 if (item.date.start.toDateString() === picker.$date[0].toDateString() && item.date.end.toDateString() === picker.$date[1].toDateString()) {
                   scope.ctrl.rangeType = item.value;
                   flag = true;
@@ -688,11 +693,101 @@ angular.module('mgcrea.ngStrap.rangedatepicker', [ 'mgcrea.ngStrap.helpers.dateP
             }
             return false;
           }
-        };
+        }, {
+          name: 'month',
+          format: options.monthFormat,
+          split: 4,
+          steps: {
+            year: 1
+          },
+          rangeList: [
+            {name: 'This Month', value: '0m', date: {start: new Date(t.getFullYear(), t.getMonth(), 1), end: t}},
+            {name: 'Last Month', value: '-1m', date: {start: new Date(t.getFullYear(), t.getMonth() - 1, 1), end: new Date(t.getFullYear(), t.getMonth(), 0)}},
+            {name: 'Two Months Ago', value: '-2m', date: {start: new Date(t.getFullYear(), t.getMonth() - 2, 1), end: new Date(t.getFullYear(), t.getMonth() - 1, 0)}}
+          ],
+          update: function(sDate, eDate, force) {
+            viewDate.startDate = {
+              year: sDate.getFullYear(),
+              month: sDate.getMonth(),
+              date: sDate.getDate()
+            };
+            viewDate.endDate = {
+              year: eDate.getFullYear(),
+              month: eDate.getMonth(),
+              date: eDate.getDate()
+            };
+            picker.$build();
+          },
+          build: function() {
+            var that = this;
+            scope.title = [];
+            scope.rows = [];
+            ['startDate', 'endDate'].forEach(function (value, index) {
+              var months = [];
+              var month;
+
+              for (var i = 0; i < 12; i++) {
+                month = new Date(viewDate[value].year, i, 1);
+                months.push({
+                  date: month,
+                  label: formatDate(month, that.format),
+                  selected: picker.$date && picker.$date[index] && (!picker.$getCompare() || (picker.$getCompare() && !index)) && that.isSelected(picker.$date[index], month),
+                  inRange: that.isInRange(month),
+                  disabled: (index === 1 && scope.ctrl.compare) || that.isDisabled(month, index),
+                  compareSelect: index === 0 && scope.ctrl.compare && picker.$compareDate && picker.$compareDate[index] && that.isSelected(picker.$compareDate[index], month)
+                });
+              }
+              scope.title[index] = formatDate(month, options.yearTitleFormat);
+              scope.rows[index] = split(months, that.split);
+            });
+            scope.showLabels = false;
+            // set range
+            if (!scope.ctrl.compare) {
+              var flag = false;
+              that.rangeList.forEach(function (item) {
+                if (item.date.start.toDateString() === picker.$date[0].toDateString() && item.date.end.toDateString() === picker.$date[1].toDateString()) {
+                  scope.ctrl.rangeType = item.value;
+                  flag = true;
+                }
+              });
+              if (!flag) {
+                scope.ctrl.rangeType = '';
+              }
+            }
+            this.built = true;
+
+          },
+          isSelected: function(currentDate, date) {
+            return currentDate &&
+              date.getFullYear() === currentDate.getFullYear() &&
+              date.getMonth() === currentDate.getMonth();
+          },
+          isInRange: function (date) {
+            if (!picker.$date || picker.$getCompare()) {
+              return false;
+            }
+            var minDate = picker.$date[0];
+            var maxDate = picker.$date[1];
+            if (!angular.isDate(minDate) || !angular.isDate(maxDate) || !angular.isDate(date)) {
+              return false;
+            }
+            return (date.getTime() >= minDate.getTime() && date.getTime() <= maxDate.getTime());
+          },
+          isDisabled: function(date, index) {
+            var time = date.getTime();
+            var lastDate = +new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+            if (lastDate < options.minDate || date.getTime() > options.maxDate) {
+              return true;
+            }
+            // 开始时间不能选择大于结束时间的事件
+            return (!scope.ctrl.compare && picker.$date && ((index && time < picker.$date[index - 1]) || (time > picker.$date[index + 1])));
+          }
+        }];
         return {
-          view: view,
+          views: Array.prototype.slice.call(views, options.minView, options.minView + 1),
           viewDate: viewDate
         };
       };
-    } ];
+    }];
   });
