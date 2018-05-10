@@ -1,7 +1,7 @@
 <ul tabindex="-1" class="select dropdown-menu" ng-show="$isVisible()" role="select">
   <li  ng-if="$showSearch" role="presentation" >
-    <div class="select-search-container">
-      <input role="search" type="search" class="form-control" ng-model="searchText" ng-change="$searchTextChange(this)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="select-search-container pl-1x pr-1x mb-1x">
+      <input role="search" type="search" class="form-control input-sm" ng-model="searchText" ng-change="$searchTextChange(this)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
     </div>
 
   </li>
@@ -23,8 +23,8 @@
       <span ng-bind="match.label"></span>
     </a>
   </li>
-  <li ng-if="$showSearch" class="select-close-container">
-    <button class="btn btn-default btn-sm btn-close" ng-click="$close()">Close</button>
+  <li ng-if="$showSearch" class="select-close-container pl-1x pr-1x mt-1x">
+    <button class="btn btn-default btn-sm btn-close btn-block" ng-click="$close()">Close</button>
   </li>
 </ul>
 

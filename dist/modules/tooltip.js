@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2018-04-17
+ * @version v2.3.10 - 2018-05-10
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -315,6 +315,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
           evt.stopPropagation();
         }
         if ($tooltip.$isShown) {
+          element[0].focus();
           element[0].blur();
         } else {
           element[0].focus();

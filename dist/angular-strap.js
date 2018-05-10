@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2018-04-17
+ * @version v2.3.10 - 2018-05-10
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -316,6 +316,7 @@
             evt.stopPropagation();
           }
           if ($tooltip.$isShown) {
+            element[0].focus();
             element[0].blur();
           } else {
             element[0].focus();
@@ -1285,7 +1286,8 @@
         for (var i = 0, len = list.length; i < len; i++) {
           var item = list[i];
           item = angular.element(item);
-          if (item.attr('data-sortable')) {
+          var sortable = item.attr('data-sortable');
+          if (sortable && sortable !== 'false') {
             var dataName = item.attr('data-name');
             item.append('<div class="sorter"><i class="nox-sort-up sort-asc" ng-class="{active: orderBy == \'' + dataName + '\' && sortBy == \'asc\'}"></i><i class="nox-sort-down sort-desc" ng-class="{active: orderBy == \'' + dataName + '\' && sortBy == \'desc\'}"></i></div>');
           }
@@ -1312,14 +1314,13 @@
               scope[key] = scope.$eval(attrs[key]);
             }
           });
-          var list = element[0].querySelectorAll('th');
-          for (var i = 0, len = list.length; i < len; i++) {
-            var item = list[i];
-            item = angular.element(item);
-            if (item.attr('data-sortable')) {
-              item.on('click', clickColumn);
+          element.on('click', 'th', function(event) {
+            var target = angular.element(event.currentTarget);
+            var sortable = target.attr('data-sortable');
+            if (sortable && sortable !== 'false') {
+              clickColumn(event);
             }
-          }
+          });
           function clickColumn(event) {
             if (options.totalItems === -1) {
               return;
@@ -1572,6 +1573,11 @@
           _show();
           if (options.multiple) {
             $select.$element.addClass('select-multiple');
+            if (options.trigger === 'focus') {
+              $select.$element.find('input').on('blur', function() {
+                $select.hide();
+              });
+            }
           }
           $timeout(function() {
             $select.$element.on(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
@@ -1581,18 +1587,23 @@
           }, 0, false);
         };
         var _hide = $select.hide;
-        $select.hide = function() {
-          if (!options.multiple && angular.isUndefined(controller.$modelValue)) {
-            scope.$activeIndex = -1;
-          }
-          if (options.search) {
-            scope.searchText = '';
-          }
-          $select.$element.off(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
-          if (options.keyboard) {
-            element.off('keydown', $select.$onKeyDown);
-          }
-          _hide(true);
+        $select.hide = function(blur) {
+          $timeout(function() {
+            if (!blur && options.trigger === 'focus' && document.activeElement.getAttribute('role') === 'search') {
+              return;
+            }
+            if (!options.multiple && angular.isUndefined(controller.$modelValue)) {
+              scope.$activeIndex = -1;
+            }
+            if (options.search) {
+              scope.searchText = '';
+            }
+            $select.$element.off(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
+            if (options.keyboard) {
+              element.off('keydown', $select.$onKeyDown);
+            }
+            _hide(true);
+          });
         };
         return $select;
       }
@@ -1660,12 +1671,10 @@
           });
         }, true);
         scope.$watch(attr.ngModel, function(newValue, oldValue) {
-          console.warn('scope.$watch(%s)', attr.ngModel, newValue, oldValue);
           select.$updateActiveIndex();
           controller.$render();
         }, true);
         controller.$render = function() {
-          console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
           var selected;
           var index;
           if (options.multiple && angular.isArray(controller.$modelValue)) {
@@ -1700,7 +1709,7 @@
     return function(collection, keyname, value) {
       var output = [];
       angular.forEach(collection, function(item) {
-        if (item[keyname].indexOf(value) > -1) {
+        if (item[keyname].toLowerCase().indexOf(value.toLowerCase()) > -1) {
           output.push(item);
         }
       });

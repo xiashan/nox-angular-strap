@@ -427,6 +427,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
           if (options.mouseDownStopPropagation) { evt.stopPropagation(); }
           // Some browsers do not auto-focus buttons (eg. Safari)
           if ($tooltip.$isShown) {
+            element[0].focus();
             element[0].blur();
           } else {
             element[0].focus();

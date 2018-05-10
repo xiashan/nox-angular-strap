@@ -291,6 +291,11 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
           _show();
           if (options.multiple) {
             $select.$element.addClass('select-multiple');
+            if (options.trigger === 'focus') {
+              $select.$element.find('input').on('blur', function () {
+                $select.hide();
+              });
+            }
           }
           // use timeout to hookup the events to prevent
           // event bubbling from being processed imediately.
@@ -303,20 +308,25 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
         };
 
         var _hide = $select.hide;
-        $select.hide = function () {
-          if (!options.multiple && angular.isUndefined(controller.$modelValue)) {
-            scope.$activeIndex = -1;
-          }
-          if (options.search) {
-            // search 清空
-            scope.searchText = '';
-           // return;
-          }
-          $select.$element.off(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
-          if (options.keyboard) {
-            element.off('keydown', $select.$onKeyDown);
-          }
-          _hide(true);
+        $select.hide = function (blur) {
+          $timeout(function () {
+            if (!blur && options.trigger === 'focus' && document.activeElement.getAttribute('role') === 'search') {
+              return;
+            }
+            if (!options.multiple && angular.isUndefined(controller.$modelValue)) {
+              scope.$activeIndex = -1;
+            }
+            if (options.search) {
+              // search 清空
+              scope.searchText = '';
+              // return;
+            }
+            $select.$element.off(isTouch ? 'touchstart' : 'mousedown', $select.$onMouseDown);
+            if (options.keyboard) {
+              element.off('keydown', $select.$onKeyDown);
+            }
+            _hide(true);
+          });
         };
 
         return $select;
@@ -415,14 +425,12 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
 
         // Watch model for changes
         scope.$watch(attr.ngModel, function (newValue, oldValue) {
-          console.warn('scope.$watch(%s)', attr.ngModel, newValue, oldValue);
           select.$updateActiveIndex();
           controller.$render();
         }, true);
 
         // Model rendering in view
         controller.$render = function () {
-          console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
           var selected;
           var index;
           if (options.multiple && angular.isArray(controller.$modelValue)) {
@@ -464,7 +472,7 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
       var output = [];
       angular.forEach(collection, function (item) {
         // 过滤数组中值与指定值相同的元素
-        if (item[keyname].indexOf(value) > -1) {
+        if (item[keyname].toLowerCase().indexOf(value.toLowerCase()) > -1) {
           output.push(item);
         }
       });
