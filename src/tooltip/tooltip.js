@@ -427,7 +427,8 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
           if (options.mouseDownStopPropagation) { evt.stopPropagation(); }
           // Some browsers do not auto-focus buttons (eg. Safari)
           if ($tooltip.$isShown) {
-            element[0].focus();
+            // 这段会导致datepicker不可选择，暂时注释掉
+            // element[0].focus();
             element[0].blur();
           } else {
             element[0].focus();
@@ -444,7 +445,9 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
               element.on(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.on(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
 
-              if (nodeName === 'button' && trigger !== 'hover' || (nodeName === 'input')) {
+              // 这段会导致datepicker不可选择，暂时注释掉
+              // if (nodeName === 'button' && trigger !== 'hover' || (nodeName === 'input')) {
+              if (nodeName === 'button' && trigger !== 'hover') {
                 element.on(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -460,7 +463,9 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
             } else if (trigger !== 'manual') {
               element.off(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.off(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover' || (nodeName === 'input')) {
+              // 这段会导致datepicker不可选择，暂时注释掉
+              // if (nodeName === 'button' && trigger !== 'hover' || (nodeName === 'input')) {
+              if (nodeName === 'button' && trigger !== 'hover') {
                 element.off(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }

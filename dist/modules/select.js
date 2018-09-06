@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2018-05-10
+ * @version v2.3.10 - 2018-09-06
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -372,6 +372,9 @@ angular.module('mgcrea.ngStrap.select', [ 'mgcrea.ngStrap.tooltip', 'mgcrea.ngSt
   };
 } ]).filter('searchFilter', function() {
   return function(collection, keyname, value) {
+    if (typeof value === 'undefined') {
+      return false;
+    }
     var output = [];
     angular.forEach(collection, function(item) {
       if (item[keyname].toLowerCase().indexOf(value.toLowerCase()) > -1) {

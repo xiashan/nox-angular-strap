@@ -469,6 +469,9 @@ angular.module('mgcrea.ngStrap.select', ['mgcrea.ngStrap.tooltip', 'mgcrea.ngStr
   })
   .filter('searchFilter', function () {
     return function (collection, keyname, value) {
+      if (typeof value === 'undefined') {
+        return false;
+      }
       var output = [];
       angular.forEach(collection, function (item) {
         // 过滤数组中值与指定值相同的元素

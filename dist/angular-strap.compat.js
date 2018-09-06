@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.10 - 2018-05-10
+ * @version v2.3.10 - 2018-09-06
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -316,7 +316,6 @@
             evt.stopPropagation();
           }
           if ($tooltip.$isShown) {
-            element[0].focus();
             element[0].blur();
           } else {
             element[0].focus();
@@ -330,7 +329,7 @@
             } else if (trigger !== 'manual') {
               element.on(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.on(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover' || nodeName === 'input') {
+              if (nodeName === 'button' && trigger !== 'hover') {
                 element.on(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -345,7 +344,7 @@
             } else if (trigger !== 'manual') {
               element.off(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
               element.off(trigger === 'hover' ? 'mouseleave' : 'blur', $tooltip.leave);
-              if (nodeName === 'button' && trigger !== 'hover' || nodeName === 'input') {
+              if (nodeName === 'button' && trigger !== 'hover') {
                 element.off(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
               }
             }
@@ -1707,6 +1706,9 @@
     };
   } ]).filter('searchFilter', function() {
     return function(collection, keyname, value) {
+      if (typeof value === 'undefined') {
+        return false;
+      }
       var output = [];
       angular.forEach(collection, function(item) {
         if (item[keyname].toLowerCase().indexOf(value.toLowerCase()) > -1) {

@@ -1,5 +1,5 @@
 <div class="dropdown-menu datepicker" ng-class="'datetimepicker-mode-' + $mode">
-  <table style="table-layout: fixed; height: 100%; width: 100%;" ng-if="$mode">
+  <table ng-if="$mode">
     <thead>
     <tr class="text-center">
       <th>
@@ -49,7 +49,7 @@
     </tfoot>
   </table>
   
-  <table style="table-layout: fixed; height: 100%; width: 100%;" ng-if="!$mode">
+  <table ng-if="!$mode">
     <thead>
     <tr class="text-center">
       <th>
@@ -86,7 +86,7 @@
         </button>
       </td>
       <td class="text-center">
-        <span ng-bind="i == midIndex ? timeSeparator : ' '"></span>
+        <span ng-bind="i == midIndex ? timeSeparator : ' '" class="time-separator"></span>
       </td>
       <td class="text-center">
         <button tabindex="-1" ng-if="row[1].date" type="button" class="btn btn-sm btn-default" ng-class="{'btn-primary': row[1].selected}" ng-click="$selectTime(row[1].date, 1)" ng-disabled="row[1].disabled">
@@ -94,7 +94,7 @@
         </button>
       </td>
       <td class="text-center" ng-if="showSeconds">
-        <span ng-bind="i == midIndex ? timeSeparator : ' '"></span>
+        <span ng-bind="i == midIndex ? timeSeparator : ' '" class="time-separator"></span>
       </td>
       <td ng-if="showSeconds" class="text-center">
         <button tabindex="-1" ng-if="row[2].date" type="button" class="btn btn-sm btn-default" ng-class="{'btn-primary': row[2].selected}" ng-click="$selectTime(row[2].date, 2)" ng-disabled="row[2].disabled">
